@@ -20,14 +20,15 @@
 
 #include "planner_common/map_manager.h"
 #include "planner_common/params.h"
+#include "planner_common/timed_voxblox_server.h"
 
 #define use_tsdf
 
 #ifdef use_tsdf
-typedef voxblox::TsdfServer MapManagerVoxbloxServer;
+typedef TimedVoxbloxServer<voxblox::TsdfServer> MapManagerVoxbloxServer;
 typedef voxblox::TsdfVoxel MapManagerVoxbloxVoxel;
 #else
-typedef voxblox::EsdfServer MapManagerVoxbloxServer;
+typedef TimedVoxbloxServer<voxblox::EsdfServer> MapManagerVoxbloxServer;
 typedef voxblox::EsdfVoxel MapManagerVoxbloxVoxel;
 #endif
 

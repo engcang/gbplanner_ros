@@ -2,7 +2,6 @@
   <!-- All settings -->
   <arg name="robot_name" default="rmf_obelix"/>
   <arg name="use_sim_time" default="false"/>
-  <arg name="rviz_en" default="true" />
   <arg name="launch_prefix" default=""/> <!-- gdb -ex run //args -->
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
@@ -14,7 +13,7 @@
 
 
   <arg name="odometry_topic" default="/quad_0/odom"/>
-  <arg name="pointcloud_topic" default="/quad0_pcl_render_node/cloud"/>
+  <arg name="pointcloud_topic" default="/transformed_cloud"/>
   <!-- Graph based planning -->
   <node pkg="gbplanner" type="gbplanner_node" name="gbplanner_node" output="screen" launch-prefix="$(arg launch_prefix)">
     <remap from="odometry" to="$(arg odometry_topic)" />
@@ -34,7 +33,6 @@
 
   <node pkg="gbplanner" type="traj_to_position_cmd_lookahead.py" name="traj_to_position_cmd_node" output="screen"/>
 
-  <node pkg="rviz" type="rviz" name="gbplanner_ui" output="screen" args="-d $(find gbplanner)/config/rviz/marsim.rviz"/>
   <node pkg="gbplanner" type="auto_trigger.py" name="auto_trigger" output="screen" />
 
 </launch>

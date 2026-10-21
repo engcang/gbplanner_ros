@@ -2202,13 +2202,7 @@ bool Rrg::search(geometry_msgs::Pose source_pose,
   int final_target_id;
   ConnectStatus status = findPathToConnect(
       source, target, graph_search, sampling_params, final_target_id, path_ret);
-  if (status == ConnectStatus::kSuccess)
-    return true;
-  else
-    return false;
-  // visualization
-  visualization_->visualizeGraph(graph_search);
-  visualization_->visualizeSampler(random_sampler_to_search_);
+  return status == ConnectStatus::kSuccess;
 }
 
 ConnectStatus Rrg::findPathToConnect(

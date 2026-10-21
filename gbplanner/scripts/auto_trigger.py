@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_srvs.srv import Trigger
+from std_msgs.msg import Empty
 from planner_msgs.srv import pci_initialization
 
 REQUIRED_TOPICS = [
@@ -33,6 +34,8 @@ def main():
 
     rospy.wait_for_service('/pci_initialization_trigger')
     rospy.wait_for_service('/planner_control_interface/std_srvs/automatic_planning')
+    start_signal_publisher = rospy.Publisher('/start_signal', Empty, queue_size=3)
+    start_message = Empty()
 
     try:
         init_srv = rospy.ServiceProxy('/pci_initialization_trigger', pci_initialization)
@@ -44,6 +47,7 @@ def main():
         rospy.loginfo("Calling automatic_planning...")
         plan_resp = plan_srv()
         rospy.loginfo("Planning response: %s", plan_resp.message)
+        start_signal_publisher.publish(start_message)
 
     except rospy.ServiceException as e:
         rospy.logerr("Service call failed: %s", e)

@@ -1,8 +1,12 @@
 #ifndef GBPLANNER_H_
 #define GBPLANNER_H_
+
+
+#include <chrono>
 #include <ros/ros.h>
 #include <std_srvs/SetBool.h>
 #include <std_srvs/Trigger.h>
+#include <std_msgs/Float32MultiArray.h>
 
 #include "gbplanner/gbplanner_rviz.h"
 #include "gbplanner/rrg.h"
@@ -26,115 +30,124 @@
 #include "planner_msgs/planner_srv.h"
 #include "planner_msgs/planner_string_trigger.h"
 
-namespace explorer {
 
-class Gbplanner {
- public:
-  enum PlannerStatus { NOT_READY = 0, READY };
+using Clock = std::chrono::high_resolution_clock;
 
-  Gbplanner(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
-  Gbplanner(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
-            MapManagerVoxblox<MapManagerVoxbloxServer, MapManagerVoxbloxVoxel>*
-                map_manager);
 
-  void initializeAttributes();
+namespace explorer
+{
 
-  bool plannerServiceCallback(planner_msgs::planner_srv::Request& req,
-                              planner_msgs::planner_srv::Response& res);
+    class Gbplanner
+    {
+    public:
+        enum PlannerStatus
+        {
+            NOT_READY = 0,
+            READY
+        };
 
-  void setGeofenceManager(std::shared_ptr<GeofenceManager> geofence_manager);
-  void setUntraversablePolygon(
-      const geometry_msgs::PolygonStamped& polygon_msgs);
-  void setSharedParams(const RobotParams& robot_params,
-                       const BoundedSpaceParams& global_space_params);
-  void setSharedParams(const RobotParams& robot_params,
-                       const BoundedSpaceParams& global_space_params,
-                       const BoundedSpaceParams& local_space_params);
+        Gbplanner(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private);
+        Gbplanner(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private, MapManagerVoxblox<MapManagerVoxbloxServer, MapManagerVoxbloxVoxel> *map_manager);
 
-  Rrg* rrg_;
+        void initializeAttributes();
 
- private:
-  ros::NodeHandle nh_;
-  ros::NodeHandle nh_private_;
-  ros::ServiceServer planner_service_;
-  ros::ServiceServer global_planner_service_;
-  ros::ServiceServer planner_homing_service_;
-  ros::ServiceServer planner_set_homing_pos_service_;
-  ros::ServiceServer planner_search_service_;
-  ros::ServiceServer planner_geofence_service_;
-  ros::ServiceServer planner_passing_gate_service_;
-  ros::ServiceServer planner_set_global_bound_service_;
-  ros::ServiceServer planner_set_dynamic_global_bound_service_;
-  ros::ServiceServer planner_clear_untraversable_zones_service_;
-  ros::ServiceServer planner_load_graph_service_;
-  ros::ServiceServer planner_save_graph_service_;
-  ros::ServiceServer planner_goto_wp_service_;
-  ros::ServiceServer planner_enable_untraversable_polygon_subscriber_service_;
-  ros::ServiceServer planner_set_planning_trigger_mode_service_;
+        bool plannerServiceCallback(planner_msgs::planner_srv::Request &req,
+                                    planner_msgs::planner_srv::Response &res);
 
-  ros::Subscriber pose_subscriber_;
-  ros::Subscriber pose_stamped_subscriber_;
-  ros::Subscriber odometry_subscriber_;
-  ros::Subscriber untraversable_polygon_subscriber_;
-  ros::Subscriber robot_status_subcriber_;
-  ros::ServiceClient map_save_service_;
+        void setGeofenceManager(std::shared_ptr<GeofenceManager> geofence_manager);
+        void setUntraversablePolygon(
+            const geometry_msgs::PolygonStamped &polygon_msgs);
+        void setSharedParams(const RobotParams &robot_params,
+                             const BoundedSpaceParams &global_space_params);
+        void setSharedParams(const RobotParams &robot_params,
+                             const BoundedSpaceParams &global_space_params,
+                             const BoundedSpaceParams &local_space_params);
 
-  PlannerStatus planner_status_;
+        Rrg *rrg_;
 
-  bool homingServiceCallback(planner_msgs::planner_homing::Request& req,
-                             planner_msgs::planner_homing::Response& res);
-  bool setHomingPosServiceCallback(
-      planner_msgs::planner_set_homing_pos::Request& req,
-      planner_msgs::planner_set_homing_pos::Response& res);
-  bool plannerSearchServiceCallback(
-      planner_msgs::planner_search::Request& req,
-      planner_msgs::planner_search::Response& res);
-  bool globalPlannerServiceCallback(
-      planner_msgs::planner_global::Request& req,
-      planner_msgs::planner_global::Response& res);
-  bool geofenceServiceCallback(planner_msgs::planner_geofence::Request& req,
-                               planner_msgs::planner_geofence::Response& res);
-  bool passingGateCallback(planner_msgs::planner_request_path::Request& req,
-                           planner_msgs::planner_request_path::Response& res);
-  bool setGlobalBound(planner_msgs::planner_set_global_bound::Request& req,
-                      planner_msgs::planner_set_global_bound::Response& res);
-  bool setDynamicGlobalBound(
-      planner_msgs::planner_dynamic_global_bound::Request& req,
-      planner_msgs::planner_dynamic_global_bound::Response& res);
-  bool clearUntraversableZones(std_srvs::Trigger::Request& req,
-                               std_srvs::Trigger::Response& res);
+    private:
+        ros::NodeHandle nh_;
+        ros::NodeHandle nh_private_;
+        ros::ServiceServer planner_service_;
+        ros::ServiceServer global_planner_service_;
+        ros::ServiceServer planner_homing_service_;
+        ros::ServiceServer planner_set_homing_pos_service_;
+        ros::ServiceServer planner_search_service_;
+        ros::ServiceServer planner_geofence_service_;
+        ros::ServiceServer planner_passing_gate_service_;
+        ros::ServiceServer planner_set_global_bound_service_;
+        ros::ServiceServer planner_set_dynamic_global_bound_service_;
+        ros::ServiceServer planner_clear_untraversable_zones_service_;
+        ros::ServiceServer planner_load_graph_service_;
+        ros::ServiceServer planner_save_graph_service_;
+        ros::ServiceServer planner_goto_wp_service_;
+        ros::ServiceServer planner_enable_untraversable_polygon_subscriber_service_;
+        ros::ServiceServer planner_set_planning_trigger_mode_service_;
 
-  bool plannerLoadGraphCallback(
-      planner_msgs::planner_string_trigger::Request& req,
-      planner_msgs::planner_string_trigger::Response& res);
+        ros::Subscriber pose_subscriber_;
+        ros::Subscriber pose_stamped_subscriber_;
+        ros::Subscriber odometry_subscriber_;
+        ros::Subscriber untraversable_polygon_subscriber_;
+        ros::Subscriber robot_status_subcriber_;
+        ros::Publisher calc_time_pub_;
+        ros::ServiceClient map_save_service_;
 
-  bool plannerSaveGraphCallback(
-      planner_msgs::planner_string_trigger::Request& req,
-      planner_msgs::planner_string_trigger::Response& res);
+        PlannerStatus planner_status_;
 
-  // Goes to a point in the global graph that is closest to the given waypoint
-  bool plannerGotoWaypointCallback(
-      planner_msgs::planner_go_to_waypoint::Request& req,
-      planner_msgs::planner_go_to_waypoint::Response& res);
+        bool homingServiceCallback(planner_msgs::planner_homing::Request &req,
+                                   planner_msgs::planner_homing::Response &res);
+        bool setHomingPosServiceCallback(
+            planner_msgs::planner_set_homing_pos::Request &req,
+            planner_msgs::planner_set_homing_pos::Response &res);
+        bool plannerSearchServiceCallback(
+            planner_msgs::planner_search::Request &req,
+            planner_msgs::planner_search::Response &res);
+        bool globalPlannerServiceCallback(
+            planner_msgs::planner_global::Request &req,
+            planner_msgs::planner_global::Response &res);
+        bool geofenceServiceCallback(planner_msgs::planner_geofence::Request &req,
+                                     planner_msgs::planner_geofence::Response &res);
+        bool passingGateCallback(planner_msgs::planner_request_path::Request &req,
+                                 planner_msgs::planner_request_path::Response &res);
+        bool setGlobalBound(planner_msgs::planner_set_global_bound::Request &req,
+                            planner_msgs::planner_set_global_bound::Response &res);
+        bool setDynamicGlobalBound(
+            planner_msgs::planner_dynamic_global_bound::Request &req,
+            planner_msgs::planner_dynamic_global_bound::Response &res);
+        bool clearUntraversableZones(std_srvs::Trigger::Request &req,
+                                     std_srvs::Trigger::Response &res);
 
-  bool plannerEnableUntraversablePolygonSubscriberCallback(
-      std_srvs::SetBool::Request& request,
-      std_srvs::SetBool::Response& response);
+        bool plannerLoadGraphCallback(
+            planner_msgs::planner_string_trigger::Request &req,
+            planner_msgs::planner_string_trigger::Response &res);
 
-  bool plannerSetPlanningTriggerModeCallback(
-      planner_msgs::planner_set_planning_mode::Request& request,
-      planner_msgs::planner_set_planning_mode::Response& response);
+        bool plannerSaveGraphCallback(
+            planner_msgs::planner_string_trigger::Request &req,
+            planner_msgs::planner_string_trigger::Response &res);
 
-  void untraversablePolygonCallback(
-      const geometry_msgs::PolygonStamped& polygon_msgs);
-  void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pose);
-  void poseStampedCallback(const geometry_msgs::PoseStamped& pose);
-  void processPose(const geometry_msgs::Pose& pose);
-  void odometryCallback(const nav_msgs::Odometry& odo);
-  void robotStatusCallback(const planner_msgs::RobotStatus& status);
+        // Goes to a point in the global graph that is closest to the given waypoint
+        bool plannerGotoWaypointCallback(
+            planner_msgs::planner_go_to_waypoint::Request &req,
+            planner_msgs::planner_go_to_waypoint::Response &res);
 
-  Gbplanner::PlannerStatus getPlannerStatus();
-};
+        bool plannerEnableUntraversablePolygonSubscriberCallback(
+            std_srvs::SetBool::Request &request,
+            std_srvs::SetBool::Response &response);
 
-}  // namespace explorer
+        bool plannerSetPlanningTriggerModeCallback(
+            planner_msgs::planner_set_planning_mode::Request &request,
+            planner_msgs::planner_set_planning_mode::Response &response);
+
+        void untraversablePolygonCallback(
+            const geometry_msgs::PolygonStamped &polygon_msgs);
+        void poseCallback(const geometry_msgs::PoseWithCovarianceStamped &pose);
+        void poseStampedCallback(const geometry_msgs::PoseStamped &pose);
+        void processPose(const geometry_msgs::Pose &pose);
+        void odometryCallback(const nav_msgs::Odometry &odo);
+        void robotStatusCallback(const planner_msgs::RobotStatus &status);
+
+        Gbplanner::PlannerStatus getPlannerStatus();
+    };
+
+} // namespace explorer
 #endif

@@ -1,5 +1,27 @@
 #include "planner_common/random_sampler.h"
 
+#include <atomic>
+#include <cstdint>
+
+namespace {
+//Codex: Seed each sampler once with a distinct deterministic stream. Resetting its bounds must not replay identical samples.
+void seedGenerator(std::mt19937& generator, bool& initialized) {
+  int seed;
+  if (ros::param::get("/evaluation_seed", seed)) {
+    if (!initialized) {
+      static std::atomic<std::uint32_t> next_stream{0};
+      std::seed_seq sequence{static_cast<std::uint32_t>(seed), next_stream.fetch_add(1)};
+      generator.seed(sequence);
+      initialized = true;
+    }
+  } else {
+    std::random_device rd;
+    generator.seed(rd());
+  }
+}
+}
+
+
 RandomSamplerBase::RandomSamplerBase() {
   mean_val_ = 0.0;
   std_val_ = 0.0;
@@ -132,8 +154,7 @@ void RandomSamplerBase::setDistributionParams(double mean_val, double std_val) {
 }
 
 void RandomSamplerBase::reset() {
-  std::random_device rd;
-  generator_.seed(rd());
+  seedGenerator(generator_, evaluation_seeded_);
   if (pdf_type_ == RandomDistributionType::kUniform) {
     uniform_pdf_.reset(
         new std::uniform_real_distribution<>(min_val_, max_val_));
@@ -240,8 +261,7 @@ bool RandomSampler::setParams(BoundedSpaceParams& global_params,
 }
 
 void RandomSampler::RandomSampler::reset() {
-  std::random_device rd;
-  generator_.seed(rd());
+  seedGenerator(generator_, evaluation_seeded_);
   chi_squared_.reset(new std::chi_squared_distribution<>(1));
   for (int i = 0; i < 4; ++i) {
     random_sampler_base_[i].reset();

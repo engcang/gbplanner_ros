@@ -569,7 +569,8 @@ void MapManagerVoxblox<SDFServerType, SDFVoxelType>::getScanStatus(
   int height = sensor_params.height;
   int width = sensor_params.width;
   Eigen::MatrixXd starting_points(
-      height, width);  // This will store the distance along the ray from where
+      width, height);  //Codex: Access below is (x, y), so rows must cover width.
+                       // This stores the distance along the ray from where
                        // the raycasting should begin
   starting_points.setZero();
 
@@ -691,11 +692,11 @@ void MapManagerVoxblox<SDFServerType, SDFVoxelType>::getScanStatus(
           double y_increment_dist = step * sensor_params.resolution[1];
           double diag_increment_dist = std::sqrt(std::pow(x_increment_dist, 2) +
                                                  std::pow(y_increment_dist, 2));
-          if (x_increment_dist <= voxel_size && x < width)
+          if (x_increment_dist <= voxel_size && x + 1 < width)
             starting_points(x + 1, y) = std::min(ray_norm, step);
           if (y_increment_dist <= voxel_size && y > 0)
             starting_points(x, y - 1) = std::min(ray_norm, step);
-          if (diag_increment_dist <= voxel_size && x < width && y > 0)
+          if (diag_increment_dist <= voxel_size && x + 1 < width && y > 0)
             starting_points(x + 1, y - 1) = std::min(ray_norm, step);
           continue;
         }
@@ -711,11 +712,11 @@ void MapManagerVoxblox<SDFServerType, SDFVoxelType>::getScanStatus(
         double y_increment_dist = step * sensor_params.resolution[1];
         double diag_increment_dist = std::sqrt(std::pow(x_increment_dist, 2) +
                                                std::pow(y_increment_dist, 2));
-        if (x_increment_dist <= voxel_size && x < width)
+        if (x_increment_dist <= voxel_size && x + 1 < width)
           starting_points(x + 1, y) = -step;
         if (y_increment_dist <= voxel_size && y > 0)
           starting_points(x, y - 1) = -step;
-        if (diag_increment_dist <= voxel_size && x < width && y > 0)
+        if (diag_increment_dist <= voxel_size && x + 1 < width && y > 0)
           starting_points(x + 1, y - 1) = -step;
         break;
       }
@@ -737,7 +738,8 @@ void MapManagerVoxblox<SDFServerType, SDFVoxelType>::getScanStatusIterative(
   int height = sensor_params.height;
   int width = sensor_params.width;
   Eigen::MatrixXd starting_points(
-      height, width);  // This will store the distance along the ray from where
+      width, height);  //Codex: Access below is (x, y), so rows must cover width.
+                       // This stores the distance along the ray from where
                        // the raycasting should begin
   starting_points.setZero();
 
@@ -859,11 +861,11 @@ void MapManagerVoxblox<SDFServerType, SDFVoxelType>::getScanStatusIterative(
           double y_increment_dist = step * sensor_params.resolution[1];
           double diag_increment_dist = std::sqrt(std::pow(x_increment_dist, 2) +
                                                  std::pow(y_increment_dist, 2));
-          if (x_increment_dist <= voxel_size && x < width)
+          if (x_increment_dist <= voxel_size && x + 1 < width)
             starting_points(x + 1, y) = std::min(ray_norm, step);
           if (y_increment_dist <= voxel_size && y > 0)
             starting_points(x, y - 1) = std::min(ray_norm, step);
-          if (diag_increment_dist <= voxel_size && x < width && y > 0)
+          if (diag_increment_dist <= voxel_size && x + 1 < width && y > 0)
             starting_points(x + 1, y - 1) = std::min(ray_norm, step);
           continue;
         }
@@ -879,11 +881,11 @@ void MapManagerVoxblox<SDFServerType, SDFVoxelType>::getScanStatusIterative(
         double y_increment_dist = step * sensor_params.resolution[1];
         double diag_increment_dist = std::sqrt(std::pow(x_increment_dist, 2) +
                                                std::pow(y_increment_dist, 2));
-        if (x_increment_dist <= voxel_size && x < width)
+        if (x_increment_dist <= voxel_size && x + 1 < width)
           starting_points(x + 1, y) = -step;
         if (y_increment_dist <= voxel_size && y > 0)
           starting_points(x, y - 1) = -step;
-        if (diag_increment_dist <= voxel_size && x < width && y > 0)
+        if (diag_increment_dist <= voxel_size && x + 1 < width && y > 0)
           starting_points(x + 1, y - 1) = -step;
         break;
       }

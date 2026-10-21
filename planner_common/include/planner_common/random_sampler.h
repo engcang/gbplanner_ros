@@ -38,6 +38,7 @@ class RandomSamplerBase {
 
  private:
   std::mt19937 generator_;
+  bool evaluation_seeded_ = false;
   RandomDistributionType pdf_type_;
   SampleModeType sample_mode_;
   double const_val_;
@@ -97,6 +98,7 @@ class RandomSampler {
 
   // Used to generate multivariate Cauchy distribution
   std::mt19937 generator_;
+  bool evaluation_seeded_ = false;
   std::shared_ptr<std::chi_squared_distribution<double>> chi_squared_;
 };
 
